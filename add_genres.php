@@ -1,3 +1,36 @@
+<?php
+  require_once('classes/database.php');
+
+  $con = new database();
+  $sweetAlertConfig = "";
+
+  if(isset($_POST['addGenres'])) {
+
+    //Getting the personal information
+    $genreName = $_POST['genreName'];
+
+
+    $genreID = $con->addGenres($genreName);
+      if($genreID) {
+        $sweetAlertConfig = "
+            	<script>
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Genre Added',
+                  text: 'A new genre has been added successfully!',
+                  confirmButtonText: 'OK'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = 'add_genres.php';
+                  }
+                })
+              </script>";
+      } else {
+        $_SESSION['error'] = "Sorry, there was an error signing up.";
+      }
+  }
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,14 +39,25 @@
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Correct Bootstrap Icons CSS -->
   <title>Genres</title>
+
+  <script src="https://dist.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="package/dist/sweetalert2.js"></script>
+  <link rel="stylesheet" href="package/dist/sweetalert2.css">
 </head>
 <body>
+  <?php
+  if (!empty($sweetAlertConfig)) {
+      echo $sweetAlertConfig;
+      exit; // Stop further execution
+  }
+  ?>
+
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Library Management System (Admin)</a>
-      <a class="btn btn-outline-light ms-auto" href="add_authors.html">Add Authors</a>
-      <a class="btn btn-outline-light ms-2 active" href="add_genres.html">Add Genres</a>
-      <a class="btn btn-outline-light ms-2" href="add_books.html">Add Books</a>
+      <a class="btn btn-outline-light ms-auto" href="add_authors.php">Add Authors</a>
+      <a class="btn btn-outline-light ms-2 active" href="add_genres.php">Add Genres</a>
+      <a class="btn btn-outline-light ms-2" href="add_books.php">Add Books</a>
       <div class="dropdown ms-2">
         <button class="btn btn-outline-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="bi bi-person-circle"></i> <!-- Bootstrap icon -->
@@ -46,12 +90,12 @@
 <div class="container my-5 border border-2 rounded-3 shadow p-4 bg-light">
 
   <h4 class="mt-5">Add New Genre</h4>
-  <form>
+  <form  method="POST" action="">
     <div class="mb-3">
       <label for="genreName" class="form-label">Genre Name</label>
-      <input type="text" class="form-control" id="genreName" required>
+      <input type="text" class="form-control" id="genreName" name="genreName" required>
     </div>
-    <button type="submit" class="btn btn-primary">Add Genre</button>
+    <button type="submit" id="addGenres" name="addGenres" class="btn btn-primary">Add Genre</button>
   </form>
 </div>
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
