@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once('classes/database.php');
 
 $con = new database();
@@ -12,7 +13,7 @@ if(empty($_POST['id'])) {
     $data = $con->viewGenresID($id);
 }
 
-if(isset($_POST['update'])) {
+if(isset($_POST['updateGenre2'])) {
 
     //Getting the personal information
     $genre_id = $_POST['genre_id'];
@@ -29,7 +30,7 @@ if(isset($_POST['update'])) {
                   confirmButtonText: 'OK'
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    window.location.href = 'admin_homepage.php';
+                    window.location.href = 'update_genres.php';
                   }
                 })
               </script>";
@@ -50,7 +51,7 @@ if(isset($_POST['update'])) {
   <title>Genres</title>
 
   <script src="https://dist.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="package/dist/sweetalert2.js"></script>
+  
   <link rel="stylesheet" href="package/dist/sweetalert2.css">
 </head>
 <body>
@@ -105,12 +106,14 @@ if(isset($_POST['update'])) {
       <label for="genre_name" class="form-label">Genre Name</label>
       <input type="text" value="<?php echo $data['genre_name']?>" class="form-control" id="genre_name" name="genre_name" required>
     </div>
-    <button type="submit" id="update" name="update" class="btn btn-primary">Add Genre</button>
+    <button type="submit" id="update" name="updateGenre2" class="btn btn-primary">Update Genre</button>
   </form>
-
-  <?php echo $sweetAlertConfig; ?>
+  
 
 </div>
+
+<script src="./package/dist/sweetalert2.js"></script>
+  <?php echo $sweetAlertConfig; ?>
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Add Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Correct Bootstrap JS -->
