@@ -55,10 +55,10 @@ if (isset($_POST['login'])) {
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="https://cdnjsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="package/dist/sweetalert2.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="./package/dist/sweetalert2.css">
 
-  <script src="package/dist/sweetalert2.js"></script>
+  
 
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -71,13 +71,6 @@ if (isset($_POST['login'])) {
 
 </head>
 <body>
-<?php
-if (!empty($sweetAlertConfig)) {
-    echo $sweetAlertConfig;
-    exit; // Stop further execution
-}
-?>
-    
 
   <div class="container custom-container rounded-3 shadow p-4 bg-light mt-5">
     <h3 class="text-center mb-4">Login</h3>
@@ -110,6 +103,8 @@ if (!empty($sweetAlertConfig)) {
   </div>
 
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
+    <script src="./package/dist/sweetalert2.js"></script>
+    <?php echo $sweetAlertConfig; ?>
 
 
 </body>

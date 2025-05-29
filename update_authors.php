@@ -1,12 +1,14 @@
 <?php
-session_start();
-require_once('classes/database.php');
 
+require_once('classes/database.php');
 $con = new database();
+session_start();
 $sweetAlertConfig = "";
 
-if(empty($_POST['id'])) {
-    header('location:admin_homepage.php');
+if(empty($id = $_POST['id'])) {
+
+    header('location:index.php');
+
 } else {
     $id = $_POST['id'];
     $data = $con->viewAuthorsID($id);
@@ -14,14 +16,13 @@ if(empty($_POST['id'])) {
 
 if(isset($_POST['update'])) {
 
-    //Getting the personal information
-    $author_id = $_POST['author_id'];
+    $id = $_POST['id'];
     $author_FN = $_POST['author_FN'];
     $author_LN = $_POST['author_LN'];
     $author_Bday = $_POST['author_Bday'];
     $author_Nation = $_POST['author_Nation'];
+    $authorID = $con->updateAuthor($author_FN, $author_LN, $author_Bday, $author_Nation, $id);
 
-    $authorID = $con->updateAuthor($author_id, $author_FN, $author_LN, $author_Bday, $author_Nation);
       if($authorID) {
         $sweetAlertConfig = "
             	<script>
@@ -49,21 +50,13 @@ if(isset($_POST['update'])) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Correct Bootstrap Icons CSS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="./package/dist/sweetalert2.css">
+
   <title>Authors</title>
-
-  <script src="https://dist.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="package/dist/sweetalert2.js"></script>
-  <link rel="stylesheet" href="package/dist/sweetalert2.css">
-
 </head>
 <body>
-<?php
-if (!empty($sweetAlertConfig)) {
-    echo $sweetAlertConfig;
-    exit; // Stop further execution
-}
-?>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
@@ -104,8 +97,8 @@ if (!empty($sweetAlertConfig)) {
 
 
   <h4 class="mt-5">Update Existing Author</h4>
-  <form method="POST" action="">
-    <input type="hidden" class="form-control" id="author_id" name="author_id" value="<?php echo $data['author_id']?>" required>
+  <form method="POST" action="" novalidate>
+    
     <div class="mb-3">
       <label for="authorFirstName" class="form-label">First Name</label>
       <input type="text" value="<?php echo $data['author_FN']?>" class="form-control" id="author_FN" name="author_FN" required>
@@ -120,8 +113,8 @@ if (!empty($sweetAlertConfig)) {
     </div>
     <div class="mb-3">
       <label for="authorNationality" class="form-label">Nationality</label>
-      <select class="form-select" id="author_Nation" name="author_Nation" required>
-        <option value="" disabled selected><?php echo $data ['author_nat']?></option>
+      <select class="form-select" value="<?php echo $data ['author_nat']?>" id="author_Nation" name="author_Nation" required>
+        <option value="" disabled selected>Select Nationality</option>
         <option value="American">Filipino</option>
         <option value="American">American</option>
         <option value="British">British</option>
@@ -138,11 +131,14 @@ if (!empty($sweetAlertConfig)) {
         <option value="Other">Other</option>
       </select>
     </div>
+    <input type="hidden" class="form-control" id="author_id" name="id" value="<?php echo $data['author_id']?>" required>
     <button name="update" type="submit" class="btn btn-primary">Update Author</button>
   </form>
 </div>
+
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Add Popper.js -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Correct Bootstrap JS -->
+    <script src="./package/dist/sweetalert2.js"></script>
+    <?php echo $sweetAlertConfig; ?>
+
 </body>
 </html>

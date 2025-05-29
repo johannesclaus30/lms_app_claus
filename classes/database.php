@@ -132,12 +132,12 @@
             return $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
-        function updateAuthor($author_id, $author_FN, $author_LN, $author_Bday, $author_Nation) {
+        function updateAuthor($author_FN, $author_LN, $author_Bday, $author_Nation, $id) {
             try {
                 $con = $this->opencon();
                 $con->beginTransaction();
                 $query = $con->prepare("UPDATE authors SET author_FN = ? , author_LN = ? , author_birthday = ? , author_nat = ? WHERE author_id = ? ");
-                $query->execute([$author_FN, $author_LN, $author_Bday, $author_Nation, $author_id]);
+                $query->execute([$author_FN, $author_LN, $author_Bday, $author_Nation, $id]);
                 // Update successful
                 $con->commit();
                 return true;
@@ -161,12 +161,12 @@
             return $stmt->fetch(PDO::FETCH_ASSOC);
         }
 
-        function updateGenre($genre_id, $genre_name) {
+        function updateGenre($genre_name, $id) {
             try {
                 $con = $this->opencon();
                 $con->beginTransaction();
                 $query = $con->prepare("UPDATE Genres SET genre_name = ? WHERE genre_id = ? ");
-                $query->execute([$genre_name, $genre_id]);
+                $query->execute([$genre_name, $id]);
                 // Update successful
                 $con->commit();
                 return true;

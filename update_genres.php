@@ -1,43 +1,52 @@
-<?php
-session_start();
-require_once('classes/database.php');
+<?php 
 
+require_once('classes/database.php');
 $con = new database();
+session_start();
 $sweetAlertConfig = "";
 
-if(empty($_POST['id'])) {
-    header('location:admin_homepage.php');
+if (empty($id = $_POST['id'])) {
+
+    header('location: index.php');
 
 } else {
+
     $id = $_POST['id'];
     $data = $con->viewGenresID($id);
+
 }
 
-if(isset($_POST['updateGenre2'])) {
+if (isset($_POST['update_genre'])) {
 
-    //Getting the personal information
-    $genre_id = $_POST['genre_id'];
-    $genre_name = $_POST['genre_name'];
+  $id = $_POST['id'];
+  $genre_name = $_POST['genre_name'];
+  $genreID = $con->updateGenre($genre_name, $id);
 
-    $genresID = $con->updateGenre($genre_id, $genre_name);
-      if($genresID) {
-        $sweetAlertConfig = "
-            	<script>
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Genre Updated',
-                  text: 'An existing genre has been updated successfully!',
-                  confirmButtonText: 'OK'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    window.location.href = 'update_genres.php';
-                  }
-                })
-              </script>";
-      } else {
-        $_SESSION['error'] = "Sorry, there was an error signing up.";
-      }
+  if ($genreID) {
+
+    $sweetAlertConfig = "
+    <script>
+    
+    Swal.fire({
+        icon: 'success',
+        title: 'Genre Added Successfully',
+        text: 'Genre has been added successfully!',
+        confirmationButtontext: 'OK'
+     }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'admin_homepage.php'
+        }
+            });
+
+    </script>";
+
+  } else {
+
+    $_SESSION['error'] = "Sorry, there was an error.";
+    
   }
+
+}
 
 ?>
 
@@ -47,21 +56,11 @@ if(isset($_POST['updateGenre2'])) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Correct Bootstrap Icons CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="./package/dist/sweetalert2.css">
   <title>Genres</title>
-
-  <script src="https://dist.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-  <link rel="stylesheet" href="package/dist/sweetalert2.css">
 </head>
 <body>
-  <?php
-  if (!empty($sweetAlertConfig)) {
-      echo $sweetAlertConfig;
-      exit; // Stop further execution
-  }
-  ?>
-
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Library Management System (Admin)</a>
@@ -99,23 +98,18 @@ if(isset($_POST['updateGenre2'])) {
   </nav>
 <div class="container my-5 border border-2 rounded-3 shadow p-4 bg-light">
 
-  <h4 class="mt-5">Add New Genre</h4>
-  <form  method="POST" action="">
-    <input type="hidden" class="form-control" id="genre_id" name="genre_id" value="<?php echo $data['genre_id']?>" required>
+  <h4 class="mt-5">Update Existing Genre</h4>
+  <form method="post" action="" novalidate>
     <div class="mb-3">
       <label for="genre_name" class="form-label">Genre Name</label>
-      <input type="text" value="<?php echo $data['genre_name']?>" class="form-control" id="genre_name" name="genre_name" required>
+      <input type="text" value="<?php echo $data['genre_name'] ?>" class="form-control" name="genre_name" id="genre_name" required>
     </div>
-    <button type="submit" id="update" name="updateGenre2" class="btn btn-primary">Update Genre</button>
+    <input type="hidden" name="id" value="<?php echo $data['genre_id']; ?>">
+    <button type="submit" name="update_genre" class="btn btn-primary">Update Genre</button>
   </form>
-  
-
 </div>
-
-<script src="./package/dist/sweetalert2.js"></script>
-  <?php echo $sweetAlertConfig; ?>
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Add Popper.js -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Correct Bootstrap JS -->
+    <script src="./package/dist/sweetalert2.js"></script>
+    <?php echo $sweetAlertConfig; ?>
 </body>
 </html>
