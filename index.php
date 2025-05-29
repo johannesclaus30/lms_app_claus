@@ -55,7 +55,9 @@ if (isset($_POST['login'])) {
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="https://dist.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="package/dist/sweetalert2.css">
+
   <script src="package/dist/sweetalert2.js"></script>
 
   <!-- Required meta tags -->
@@ -67,7 +69,6 @@ if (isset($_POST['login'])) {
 
   <title>Library Management System</title>
 
-  <link rel="stylesheet" href="package/dist/sweetalert2.css">
 </head>
 <body>
 <?php
@@ -105,6 +106,7 @@ if (!empty($sweetAlertConfig)) {
         <a href="registration.php" class="text-decoration-none">Don't have an account? Register here</a>
       </div>
     </form>
+    <?php echo $sweetAlertConfig; ?>
   </div>
 
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
