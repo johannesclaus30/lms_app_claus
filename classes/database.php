@@ -176,6 +176,44 @@
                 return false; // Update failed
             }
         }
+
+        
+        function addBook($title, $isbn, $pubyear, $quantity, $genre_ids = [], $author_ids = []) {
+            $con = $this->opencon();
+            try {
+                $con->beginTransaction();
+
+                //Insert into Books table
+                $stmt = $con->prepare("INSERT INTO Books (book_title, book_isbn, book_pubyear, quantity_avail) VALUES (?,?,?,?)");
+                $stmt->execute([$title, $isbn, $pubyear, $quantity]);
+                $book_id = $con->lastInsertId();
+
+                // Insert into Books_Genres table
+                foreach ($genre_ids as $genre_id) {
+                    $stmt = $con->prepare("INSERT INTO Genre_Books (genre_id, book_id) VALUES (?,?)");
+                    $stmt->execute([$genre_id, $book_id]);
+                }
+
+
+                // Insert into Books_Authors table
+                foreach ($author_ids as $author_id) {
+                    $stmt = $con->prepare("INSERT INTO Book_Authors (book_id, author_id) VALUES (?,?)");
+                    $stmt->execute([$book_id, $author_id]);
+                }
+
+                // Insert into Book_Copy table for each quantity
+                for ($i = 0; $i < $quantity; $i++) {
+                    $stmt = $con->prepare("INSERT INTO Book_Copy (book_id, is_available) VALUES (?, 1)");
+                    $stmt->execute([$book_id]);
+                }
+
+                $con->commit();
+                return $book_id;
+            } catch (PDOException $e) {
+                $con->rollBack();
+                return false; // Update failed
+            }
+        }
     }
     
     

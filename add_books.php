@@ -1,3 +1,57 @@
+<?php
+session_start();
+
+if(empty($_SESSION['user_id'])) {
+    header('location:index.php');
+    exit();
+}
+require_once('classes/database.php');
+$con = new database();
+$sweetAlertConfig = "";
+
+// Fetch genres and authors for the form
+$genres = $con->viewGenres();
+$authors = $con->viewAuthors();
+
+if (isset($_POST['add_book'])) {
+  $title = $_POST['bookTitle'];
+  $isbn = $_POST['bookISBN'];
+  $pubyear = $_POST['bookYear'];
+  $quantity = $_POST['bookQuantity'];
+  $genre_ids = isset($_POST['bookGenres']) ? $_POST['bookGenres'] : [];
+  $author_ids = isset($_POST['bookAuthors']) ? $_POST['bookAuthors'] : [];
+
+  $result = $con->addBook($title, $isbn, $pubyear, $quantity, $genre_ids, $author_ids);
+
+  if ($result) {
+    $sweetAlertConfig = "
+      <script>
+        Swal.fire({
+          icon: 'success',
+          title: 'Book Added',
+          text: 'The book has been added successfully!',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = 'admin_homepage.php';
+          }
+        })
+      </script>";
+  } else {
+    
+    $sweetAlertConfig = "
+      <script>
+        Swal.fire({
+          icon: 'error',
+          title: 'Something went wrong',
+          text: 'There was an error adding the book. Please try again.',
+          confirmButtonText: 'OK'
+        })
+      </script>";
+  }
+}
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,6 +60,10 @@
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Correct Bootstrap Icons CSS -->
   <title>Books</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="./package/dist/sweetalert2.css">
+
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -46,43 +104,63 @@
 <div class="container my-5 border border-2 rounded-3 shadow p-4 bg-light">
 
   <h4 class="mt-5">Add New Book</h4>
-  <form>
+  <form method="POST" action="" novalidate>
     <div class="mb-3">
       <label for="bookTitle" class="form-label">Book Title</label>
-      <input type="text" class="form-control" id="bookTitle" required>
+      <input type="text" name="bookTitle" class="form-control" id="bookTitle" required>
     </div>
     <div class="mb-3">
       <label for="bookISBN" class="form-label">ISBN</label>
-      <input type="text" class="form-control" id="bookISBN" required>
+      <input type="text" name="bookISBN" class="form-control" id="bookISBN" required>
     </div>
     <div class="mb-3">
       <label for="bookYear" class="form-label">Publication Year</label>
-      <input type="number" class="form-control" id="bookYear" required>
+      <input type="number" name="bookYear" class="form-control" id="bookYear" required>
     </div>
+
     <div class="mb-3">
       <label for="bookGenres" class="form-label">Genres</label>
-      <select class="form-select" id="bookGenres" multiple required>
-        <option value="Fiction">Fiction</option>
-        <option value="Non-Fiction">Non-Fiction</option>
-        <option value="Science">Science</option>
-        <option value="History">History</option>
-        <option value="Biography">Biography</option>
-        <option value="Fantasy">Fantasy</option>
-        <option value="Mystery">Mystery</option>
+      <select class="form-select" id="bookGenres" name="bookGenres[]" multiple required>
+        <?php foreach($genres as $genre): ?>
+        <option value="<?php echo $genre['genre_id']; ?>"> <?php echo htmlspecialchars($genre['genre_name']); ?></option>
+        <?php endforeach; ?>
+
         <!-- Add more genres as needed -->
       </select>
       <small class="form-text text-muted">Hold down the Ctrl (Windows) or Command (Mac) key to select multiple genres.</small>
     </div>
+
     <div class="mb-3">
-      <label for="bookQuantity" class="form-label">Quantity Available</label>
-      <input type="number" class="form-control" id="bookQuantity" required>
+      <label for="bookAuthors" class="form-label">Authors</label>
+      <select class="form-select" id="bookAuthors" name="bookAuthors[]" multiple required>
+        <?php foreach($authors as $author): ?>
+        <option value="<?php echo $author['author_id']; ?>"> <?php echo htmlspecialchars($author['author_FN'] . ' ' . $author['author_LN']); ?></option>
+        <?php endforeach; ?>
+
+        <!-- Add more genres as needed -->
+      </select>
+      <small class="form-text text-muted">Hold down the Ctrl (Windows) or Command (Mac) key to select multiple authors.</small>
     </div>
 
-    <button type="submit" class="btn btn-primary">Add Book</button>
+
+
+
+    <div class="mb-3">
+      <label for="bookQuantity" class="form-label">Quantity Available</label>
+      <input type="number" name="bookQuantity" class="form-control" id="bookQuantity" required>
+    </div>
+
+    <button type="submit" name="add_book" class="btn btn-primary">Add Book</button>
+
+    <?php echo $sweetAlertConfig; ?>
   </form>
 </div>
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Add Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Correct Bootstrap JS -->
+
+
+    <script src="./package/dist/sweetalert2.js"></script>
+    <?php echo $sweetAlertConfig; ?>
 </body>
 </html>
